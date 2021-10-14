@@ -1,0 +1,8 @@
+#ifndef PROYECTO1_BD2_PARSERCSV_H
+#define PROYECTO1_BD2_PARSERCSV_H
+
+class ParserCSV{
+
+};
+
+#endif //PROYECTO1_BD2_PARSERCSV_H
