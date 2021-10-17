@@ -1,0 +1,5 @@
+C:/Users/usuario/Desktop/ProyectoBD2Qt/build-ProyectoQt-Desktop_Qt_6_2_0_MinGW_64_bit-Debug/CMakeFiles/ProyectoQt.dir
+C:/Users/usuario/Desktop/ProyectoBD2Qt/build-ProyectoQt-Desktop_Qt_6_2_0_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+C:/Users/usuario/Desktop/ProyectoBD2Qt/build-ProyectoQt-Desktop_Qt_6_2_0_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+C:/Users/usuario/Desktop/ProyectoBD2Qt/build-ProyectoQt-Desktop_Qt_6_2_0_MinGW_64_bit-Debug/CMakeFiles/ProyectoQt_autogen_timestamp_deps.dir
+C:/Users/usuario/Desktop/ProyectoBD2Qt/build-ProyectoQt-Desktop_Qt_6_2_0_MinGW_64_bit-Debug/CMakeFiles/ProyectoQt_autogen.dir

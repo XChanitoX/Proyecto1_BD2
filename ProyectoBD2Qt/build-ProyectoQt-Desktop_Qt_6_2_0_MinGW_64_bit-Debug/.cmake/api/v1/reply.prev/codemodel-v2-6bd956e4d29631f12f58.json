@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "ProyectoQt",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "ProyectoQt::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ProyectoQt-Debug-031731d93d049f8d09b7.json",
+					"name" : "ProyectoQt",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ProyectoQt_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ProyectoQt_autogen-Debug-bba2eb609ef753a4d484.json",
+					"name" : "ProyectoQt_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ProyectoQt_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ProyectoQt_autogen_timestamp_deps-Debug-6d40d63931f65d22965b.json",
+					"name" : "ProyectoQt_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/usuario/Desktop/ProyectoBD2Qt/build-ProyectoQt-Desktop_Qt_6_2_0_MinGW_64_bit-Debug",
+		"source" : "C:/Users/usuario/Desktop/ProyectoBD2Qt/ProyectoQt"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
