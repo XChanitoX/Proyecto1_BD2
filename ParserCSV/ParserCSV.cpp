@@ -8,7 +8,7 @@ int main(){
         throw new exception;
     }
 
-    string fileName = "../ParserCSV/RealStateDataSet.csv";
+    string fileName = "EduDataSet.csv";
 
     vector<vector<string>> parseado;
     parseado = ParserCSV(fileName);
