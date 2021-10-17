@@ -1,5 +1,4 @@
 #include "ParserCSV.h"
-#include "../Librerias.h"
 
 int main(){
     ofstream Archivo;

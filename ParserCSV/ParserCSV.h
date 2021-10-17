@@ -1,7 +1,7 @@
 #ifndef PROYECTO1_BD2_PARSERCSV_H
 #define PROYECTO1_BD2_PARSERCSV_H
 
-#include "Librerias.h"
+#include "../Librerias.h"
 
 vector<vector<string>> ParserCSV(string fileName){
     ifstream data(fileName);
