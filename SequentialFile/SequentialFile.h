@@ -27,7 +27,7 @@ private:
         if (!file.is_open())
             throw out_of_range("File not open @ write_record");
         if (file_id == FILE_ID)
-            file.seekp(pos * sizeof(Record) + sizeof(AddressType) + sizeof(char),ios::beg);
+            file.seekp(pos * sizeof(Record) + sizeof(AddressType) + sizeof(char) + sizeof(bool),ios::beg);
         else if (file_id = FILE_ID)
             file.seekp(pos*sizeof(Record),ios::beg);
         else
@@ -39,7 +39,7 @@ private:
         if (!file.is_open())
             throw out_of_range("File not open @ read_record");
         if (file_id == FILE_ID)
-            file.seekg(pos * sizeof(Record) + sizeof(AddressType) + sizeof(char),ios::beg);
+            file.seekg(pos * sizeof(Record) + sizeof(AddressType) + sizeof(char) + sizeof(bool),ios::beg);
         else if (file_id = FILE_ID)
             file.seekg(pos*sizeof(Record),ios::beg);
         else
