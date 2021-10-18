@@ -6,9 +6,13 @@
 
 enum FILE_ID {AUXFILE,DATAFILE};
 
+
 template <class Record, class Key>
 class SequentialFile{
 private:
+    string DATAFILE_DP;
+    string AUXFILE_DP;
+
     struct RecordData{
         AddressType pos;
         char ref;
@@ -71,8 +75,23 @@ private:
     static bool compare_records(Record& r1, Record& r2){
         return r1 < r2;
     }
+
+    bool is_empty(FILE_ID file_id){
+        if (file_id = DATAFILE)
+            return number_of_records(this->DATAFILE_DP,DATAFILE) == 0;
+        else if(file_id == AUXFILE)
+            return number_of_records(this->AUXFILE_DP,AUXFILE) == 0;
+        else
+            throw invalid_argument("file_id invalid @ is_empty (record)");
+    }
     
 public:
+    SequentialFile(string DATAFILE_DP_, string AUXFILE_DP_){
+        this->DATAFILE_DP = DATAFILE_DP_;
+        this->AUXFILE_DP = AUXFILE_DP_;
+    }
+
+    
 
 };
 
