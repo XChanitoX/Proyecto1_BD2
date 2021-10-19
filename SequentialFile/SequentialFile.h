@@ -235,6 +235,56 @@ public:
         }
     }
 
-    
+    vector<Record> load(){
+        fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in | ios::out);
+        fstream auxFile(this->AUXFILE_DP,ios::binary | ios::in | ios::out);
+        auto curr_pos, next_pos, i =0;
+        char curr_ref, next_ref;
+        first_read_record_data(dataFile,curr_pos,curr_ref);
+        vector<Record> records;
+        vector<Record> unordered_records;
+        while (curr_ref != INVALID){
+            Record record;
+            if (curr_ref == 'd')
+                read_record(curr_pos,dataFile,record,DATAFILE);
+            else if (curre_ref =='a')
+                read_record(curr_pos,auxFile,record,AUXFILE);
+            else
+                throw invalid_argument("Invalid reference @ load()");
+            
+            next_pos = record.nextDel;
+            next_ref = record.ref;
+
+            if (curr_ref == 'a')
+                unordered_records.push_back(r);
+            else{
+                ++i;
+                record.nextDel = i;
+                record.ref = 'd';
+                records.push_back(record);
+            }
+
+            if (next_ref == 'd' || next_ref == INVALID){
+                sort(unordered_records.begin(), unordered_records.end(),compare_records);
+                for (auto&r : unordered_records){
+                    ++i;
+                    record.nextDel = i;
+                    record.ref = 'd';
+                }
+                records.insert(records.end(),unordered_records.begin(),unordered_records.end());
+                unordered_records.clear();
+            }
+            curr_ref = next_ref;
+            curr_pos = next_pos;
+        }
+
+        if (!unordered_records.empty())
+            cout << "Unordered records not empty @ load()" << endl;
+
+        if (!records.empty())
+            records[records.size()-1].ref = INVALID;
+        
+        return records;
+    }
 };
 #endif //
