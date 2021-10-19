@@ -7,6 +7,9 @@
 #include <ctime>
 #include <iostream>
 #include <sstream>
+#include <string.h>
+#include <cstdlib>
+#include <unistd.h>
 
 using namespace std;
 

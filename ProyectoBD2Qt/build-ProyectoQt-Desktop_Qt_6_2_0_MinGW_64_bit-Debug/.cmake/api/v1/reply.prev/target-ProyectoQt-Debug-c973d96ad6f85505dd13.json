@@ -32,7 +32,7 @@
 			{
 				"command" : 3,
 				"file" : 1,
-				"line" : 26,
+				"line" : 29,
 				"parent" : 0
 			},
 			{
@@ -56,7 +56,7 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 48,
+				"line" : 51,
 				"parent" : 0
 			},
 			{
@@ -188,11 +188,11 @@
 	"dependencies" : 
 	[
 		{
-			"id" : "ProyectoQt_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
-		},
-		{
 			"backtrace" : 0,
 			"id" : "ProyectoQt_autogen::@6890427a1f51a3e7e1df"
+		},
+		{
+			"id" : "ProyectoQt_autogen_timestamp_deps::@6890427a1f51a3e7e1df"
 		}
 	],
 	"id" : "ProyectoQt::@6890427a1f51a3e7e1df",
@@ -273,7 +273,10 @@
 			[
 				3,
 				5,
-				6
+				6,
+				7,
+				8,
+				9
 			]
 		},
 		{
@@ -281,14 +284,14 @@
 			"sourceIndexes" : 
 			[
 				4,
-				7
+				10
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				8
+				11
 			]
 		}
 	],
@@ -326,6 +329,21 @@
 		{
 			"backtrace" : 4,
 			"path" : "ParserCSV.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "Librerias.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "Record.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 4,
+			"path" : "Sequential.h",
 			"sourceGroupIndex" : 1
 		},
 		{

@@ -17,7 +17,6 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QTextEdit>
@@ -34,7 +33,6 @@ public:
     QPushButton *Enviar;
     QLineEdit *lineEdit;
     QListView *Tablas;
-    QScrollBar *verticalScrollBar;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -47,7 +45,7 @@ public:
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         Respuesta = new QTableView(centralwidget);
         Respuesta->setObjectName(QString::fromUtf8("Respuesta"));
-        Respuesta->setGeometry(QRect(20, 200, 751, 341));
+        Respuesta->setGeometry(QRect(20, 200, 761, 341));
         Consulta = new QTextEdit(centralwidget);
         Consulta->setObjectName(QString::fromUtf8("Consulta"));
         Consulta->setGeometry(QRect(283, 10, 501, 141));
@@ -61,10 +59,6 @@ public:
         Tablas = new QListView(centralwidget);
         Tablas->setObjectName(QString::fromUtf8("Tablas"));
         Tablas->setGeometry(QRect(20, 40, 231, 111));
-        verticalScrollBar = new QScrollBar(centralwidget);
-        verticalScrollBar->setObjectName(QString::fromUtf8("verticalScrollBar"));
-        verticalScrollBar->setGeometry(QRect(770, 200, 20, 341));
-        verticalScrollBar->setOrientation(Qt::Vertical);
         GUI->setCentralWidget(centralwidget);
         menubar = new QMenuBar(GUI);
         menubar->setObjectName(QString::fromUtf8("menubar"));

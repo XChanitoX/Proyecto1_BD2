@@ -3,7 +3,7 @@
 
 #include "Librerias.h"
 
-vector<vector<string>> ParserCSV(string fileName){
+vector<vector<string>> ParserCSV(string fileName, char delimitador){
     ifstream data(fileName);
     string line;
     vector<vector<string>> parsedCsv;
@@ -12,7 +12,7 @@ vector<vector<string>> ParserCSV(string fileName){
         stringstream lineStream(line);
         string cell;
         vector<string> parsedRow;
-        while(getline(lineStream,cell,','))
+        while(getline(lineStream,cell,delimitador))
         {
             parsedRow.push_back(cell);
         }
