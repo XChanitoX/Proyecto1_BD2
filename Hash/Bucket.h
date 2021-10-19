@@ -3,9 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #define BLOCKFACTOR 10
-
 /// M >= (n/fb)*(1+d) --> cantidad de buckets
-
 using namespace std;
 
 template<class Record, class Key>
@@ -21,7 +19,7 @@ public:
     Bucket(int _nextBucket_);
     Bucket(Record *arrayRecords);
 
-    int getNextBucket() const;
+    int getNextBucket();
     int getNextDel();
     void setNextBucket(int nextBucket);
     void addRecord(Record record);
