@@ -182,6 +182,32 @@ public:
         return  {RecordData(prev_pos,prev_ref,prev_record),RecordData(curr_pos,curr_ref,curr_record)};
     }
     
+    vector<Record> search_record(Key key){
+        vector<Record> result;
+        auto search_result = sequential_search(key);
+        Record curr_record = search_result.second.record;
+        if (curr_record.equal_key(key)){
+            result.push_back(curr_record);
+            fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in);
+            fstream auxFile(this->AUXFILE_DP,ios::binary | ios::in);
+            auto curr_pos = curr_record.nextDel;
+            char curr_ref = curr_record.ref;
+            while (curr_ref != INVALID){
+                if (curr_ref == 'd')
+                    read_record(curr_pos,dataFile,curr_record,DATAFILE);
+                else if (curr_ref == 'a')
+                    read_record(curr_pos,auxFile,curr_record,AUXFILE);
+                else
+                    throw invalid_argument("Invalid reference @ search_record");
+                if (curr_record.equal_key(key))
+                    result.push_back(curr_record);
+                curr_pos = curr_record.nextDel;
+                curr_ref = curr_record.ref;
+            }
+        }
+        return result;
+    }
+
 };
 
 #endif //
