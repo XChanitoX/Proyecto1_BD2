@@ -3,6 +3,7 @@
 
 #include "../Librerias.h"
 #define AddressType int32_t
+#define INVALID 'x'
 
 enum FILE_ID {AUXFILE,DATAFILE};
 
@@ -39,6 +40,14 @@ private:
         file.write((char*)&record, sizeof(Record));
     }
 
+    void first_write_record_information(fstream& file, AddressType pos, char ref){
+        if (!file.is_open())
+            throw out_of_range("File not open @ first_write_record_information");
+        file.seekp(0,ios::beg);
+        file.write((char*)&pos, sizeof(AddressType));
+        file.write((char*)&ref, sizeof(char));
+    }
+
     void read_record(AddressType pos, fstream& file, Record& record, FILE_ID file_id){
         if (!file.is_open())
             throw out_of_range("File not open @ read_record");
@@ -49,6 +58,18 @@ private:
         else
             throw invalid_argument("file_id invalid @ read_record");
         file.read((char*)&record, sizeof(Record))
+    }
+
+    void first_read_record_information(fstream& file, AddressType pos, char ref){
+        if (file.is_open()){
+            file.seekg(0,ios::beg);
+            file.read((char*)&pos, sizeof(AddressType));
+            file.read((char*)&ref, sizeof(char));
+        }
+        else{
+            pos = -1;
+            ref = INVALID;
+        }
     }
 
     int number_of_records(fstream& file, FILE_ID file_id){
