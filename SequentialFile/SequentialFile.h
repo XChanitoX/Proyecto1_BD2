@@ -2,9 +2,6 @@
 #define SEQUENTIAL_FILE_H
 
 #include "../Librerias.h"
-#define AddressType int32_t
-#define INVALID 'x'
-#define MAX_CAPACITY 10
 
 enum FILE_ID {AUXFILE,DATAFILE};
 
@@ -121,6 +118,20 @@ private:
         dataFile.close();
         return ref != INVALID;
     }
+
+    void read_status_for_deleted_record(fstream&file, bool& status){
+        if (!file.is_open())
+            throw out_of_range("File not open @ read_status_for_deleted_record");
+        file.seekg(sizeof(AddressType) + sizeof(char), ios::beg);
+        file.read((char*)& status, sizeof(bool));
+    }
+
+    void write_status_for_deleted_record(fstream&file, bool status){
+        if (!file.is_open())
+            throw out_of_range("File not open @ write_status_for_deleted_record");
+        file.seekp(sizeof(AddressType) + sizeof(char), ios::beg);
+        file.write((char*)&status,sizeof(bool));
+    }
     
 public:
     SequentialFile(string DATAFILE_DP_, string AUXFILE_DP_){
@@ -133,6 +144,7 @@ public:
             sort(record.begin(), record.end(),compare_records);
             fstream file(this->DATAFILE_DP,ios::binary | ios::out);
             first_write_record_data(file,0,'d');
+            write_status_for_deleted_record(file,false);
             for (AddressType i =0; i < record.size(); i++){
                 record[i].nextDel = i + 1;
                 if (i == record.size()-1)
@@ -155,6 +167,7 @@ public:
             record.nextDel = 1;
             record.ref = INVALID;
             first_write_record_data(file, 0, 'd');
+            write_status_for_deleted_record(file,false);
             write_record(0, file, record, DATAFILE);
             file.close();
             return;
@@ -163,7 +176,13 @@ public:
             // rebuild aux file if full
         }
         fstream file(this->DATAFILE_DP,ios::binary | ios::in | ios:out);
+        bool status;
+        read_status_for_deleted_record(file,status);
         file.close();
+
+        if (status){
+            // Addition with seq search
+        }
     }
 
     pair<RecordData,RecordData> sequential_search(Key key){
@@ -281,7 +300,10 @@ public:
             write_record(curr_pos,auxFile,curr_record,AUXFILE);
         else
             throw invalid_argument("Invalid reference @ remove_record");
-        
+
+        write_status_for_deleted_record(dataFile,true);
+        dataFile.close();
+        auxFile.close();
     }
 };
 
