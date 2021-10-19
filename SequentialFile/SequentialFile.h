@@ -208,6 +208,71 @@ public:
         return result;
     }
 
+    vector<Record> search_per_range(Key start, Key end){
+        vector<Record> result;
+        auto search_result = sequential_search(start);
+        Record curr_record = search_result.second.record;
+        auto curr_pos = search_result.second.pos;
+        char curr_ref = search_result.second.ref;
+        fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in);
+        fstream auxFile(this->AUXFILE_DP, ios::binary | ios::in);
+        while (curr_ref != INVALID){
+            if (curr_record.greater_or_equal(start) && curr_record.less_or_equal(end))
+                result.push_back(curr_record);
+            curr_pos = curr_record.nextDel;
+            curr_ref = curr_record.ref;
+            if (curr_ref == 'd')
+                read_record(curr_pos,dataFile,curr_record,DATAFILE);
+            else if (curr_ref == 'a')
+                read_record(curr_pos,auxFile,auxFile,curr_record,AUXFILE);
+        }
+        sort(result.begin(),result.end(),compare_records);
+        return result;
+    }
+
+    void remove_record(Key key){
+        // check if its possible to remove_record
+        auto search_result = sequential_search(key);
+        Record curr_record = search_result.second.record;
+        if (!curr_record.equal_key(key))
+            return;
+        fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in | ios::out);
+        fstream auxFile(this->AUXFILE_DP,ios::binary | ios::in | ios::out);
+        
+        auto prev_pos = search_result.first.pos;
+        auto prev_ref = search_result.fisrt.ref;
+        Record prev_record = search_result.first.record;
+
+        auto curr_pos = search_result.second.pos;
+        auto curr_ref = search_result.second.ref;
+
+        auto next_pos = curr_record.nextDel;
+        auto next_ref = curr_record.ref;
+
+        if (prev_ref == INVALID){
+            first_write_record_data(dataFile,next_pos,next_ref);
+        }else{
+            prev_record.nextDel = next_pos;
+            prev_record.ref = next_ref;
+            if (prev_ref == 'd')
+                write_record(prev_pos,dataFile,prev_record,DATAFILE);
+            else if (prev_ref == 'a')
+                write_record(prev_pos,auxFile,prev_record,AUXFILE);
+            else
+                throw invalid_argument("Invalid reference @ remove_record");    
+        }
+
+        curr_record.nextDel = -1;
+        curr_record.ref = INVALID;
+        
+        if (curr_ref == 'd')
+            write_record(curr_pos,dataFile,curr_record,DATAFILE);
+        else if (curr_ref == 'a')
+            write_record(curr_pos,auxFile,curr_record,AUXFILE);
+        else
+            throw invalid_argument("Invalid reference @ remove_record");
+        
+    }
 };
 
 #endif //
