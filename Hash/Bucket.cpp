@@ -9,7 +9,7 @@ Bucket<Record, Key>::Bucket(int _nextBucket_):nextBucket(_nextBucket_), count(0)
 
 
 template<class Record, class Key>
-int Bucket<Record, Key>::getNextBucket() const {
+int Bucket<Record, Key>::getNextBucket(){
     return nextBucket;
 }
 
