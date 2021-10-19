@@ -112,7 +112,26 @@ public:
         this->AUXFILE_DP = AUXFILE_DP_;
     }
 
-    
+    void insert_all(vector<Record> &record){
+        if (is_empty(DATAFILE)){
+            sort(record.begin(), record.end(),compare_records);
+            fstream file(this->DATAFILE_DP,ios::binary | ios::out);
+            first_write_record_information(file,0,'d');
+            for (AddressType i =0; i < record.size(); i++){
+                record[i].nextDel = i + 1;
+                if (i == record.size()-1)
+                    record[i].ref = INVALID;
+                else
+                    record[i].ref = 'd';
+                write_record(i,file,record[i],DATAFILE);
+            }
+            file.close();
+        }
+        else{
+            for (AddressType i=0;i<record.size();i++)
+                //Add a single record
+        }
+    }
 
 };
 
