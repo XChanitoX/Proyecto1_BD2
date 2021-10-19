@@ -4,6 +4,7 @@
 #include "../Librerias.h"
 #define AddressType int32_t
 #define INVALID 'x'
+#define MAX_CAPACITY 10
 
 enum FILE_ID {AUXFILE,DATAFILE};
 
@@ -88,9 +89,9 @@ private:
 
     int number_of_records(string filename, FILE_ID file_id){
         fstream file(filename,ios::binary |ios::in);
-        auto result = number_of_records(file,file_id);
+        auto n = number_of_records(file,file_id);
         file.close();
-        return result;
+        return n;
     }
 
     static bool compare_records(Record& r1, Record& r2){
@@ -104,6 +105,12 @@ private:
             return number_of_records(this->AUXFILE_DP,AUXFILE) == 0;
         else
             throw invalid_argument("file_id invalid @ is_empty (record)");
+    }
+
+    bool is_full(){
+        if (number_of_records(this->AUXFILE_DP,AUXFILE) == MAX_CAPACITY)
+            return true;
+        return false;
     }
     
 public:
@@ -129,8 +136,25 @@ public:
         }
         else{
             for (AddressType i=0;i<record.size();i++)
-                //Add a single record
+                add_record(record[i]);
         }
+    }
+
+    void add_record(Record record){
+        if (is_empty(DATAFILE_DP)){
+            fstream file(this->DATAFILE_DP, ios::binary | ios::out);
+            record.nextDel = 1;
+            record.ref = INVALID;
+            first_write_record_information(file, 0, 'd');
+            write_record(0, file, record, DATAFILE);
+            file.close();
+            return;
+        }
+        if (is_full()){
+            // rebuild aux file if full
+        }
+        fstream file(this->DATAFILE_DP,ios::binary | ios::in | ios:out);
+        file.close();
     }
 
 };
