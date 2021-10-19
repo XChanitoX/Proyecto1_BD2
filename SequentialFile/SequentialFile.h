@@ -112,6 +112,15 @@ private:
             return true;
         return false;
     }
+
+    bool is_removable(){
+        AddressType pos;
+        char ref;
+        fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in);
+        first_read_record_data(dataFile,pos,ref);
+        dataFile.close();
+        return ref != INVALID;
+    }
     
 public:
     SequentialFile(string DATAFILE_DP_, string AUXFILE_DP_){
@@ -231,7 +240,8 @@ public:
     }
 
     void remove_record(Key key){
-        // check if its possible to remove_record
+        if (!is_removable())
+            return;
         auto search_result = sequential_search(key);
         Record curr_record = search_result.second.record;
         if (!curr_record.equal_key(key))
