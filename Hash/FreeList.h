@@ -3,23 +3,42 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 using namespace std;
 
 template<class Record>
 class FreeList {
 private:
     string fileName;
-    int readHeader();
-    void writeHeader(int header);
-    Record& readRecord(unsigned int position);
-    
+    int readHeader(fstream& file){
+        int header;
+        file.seekg(0, ios::beg);
+        file.read((char*)&header, sizeof(int));
+        return header;
+    }
+    void writeHeader(int header, fstream& file){
+        file.seekp(0, ios::beg);
+        file.write((char*)& header, sizeof(int));
+    }
+    void writeRecord(Record& record, int pos, fstream& file){
+        file.seekp(pos*sizeof(Record)+ sizeof(int), ios::beg);
+        file.write((char*)& record, sizeof(Record));
+    }
+
+    Record& readRecord(unsigned int pos, fstream& file){
+        Record record;
+        file.seekg(pos*sizeof(Record)+sizeof(int), ios::beg);
+        file.read((char*)& record, sizeof(Record));
+        return record;
+    }
 public:
     FreeList(string _fileName_): fileName(_fileName_){}
-    int length();
-    int addRecord(Record record);///Al agregar un registro, devuelve la posicion logica del registro agregado para mapearlo en hash.h
-    Record readRecord(int pos);
-    void writeRecord(Record record, int pos);
+    int length(fstream& file);
     vector<Record> scanAll();
+    ///Al agregar un registro, devuelve la posicion logica del registro agregado.
+    int addRecord(Record record);
+    Record& readRecord(int pos);
+    void writeRecord(Record record, int pos);
     bool deleteRecord(int pos);
 };
 
