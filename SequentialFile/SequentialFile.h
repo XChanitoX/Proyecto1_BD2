@@ -41,9 +41,9 @@ private:
         file.write((char*)&record, sizeof(Record));
     }
 
-    void first_write_record_information(fstream& file, AddressType pos, char ref){
+    void first_write_record_data(fstream& file, AddressType pos, char ref){
         if (!file.is_open())
-            throw out_of_range("File not open @ first_write_record_information");
+            throw out_of_range("File not open @ first_write_record_data");
         file.seekp(0,ios::beg);
         file.write((char*)&pos, sizeof(AddressType));
         file.write((char*)&ref, sizeof(char));
@@ -61,7 +61,7 @@ private:
         file.read((char*)&record, sizeof(Record))
     }
 
-    void first_read_record_information(fstream& file, AddressType pos, char ref){
+    void first_read_record_data(fstream& file, AddressType pos, char ref){
         if (file.is_open()){
             file.seekg(0,ios::beg);
             file.read((char*)&pos, sizeof(AddressType));
@@ -123,7 +123,7 @@ public:
         if (is_empty(DATAFILE)){
             sort(record.begin(), record.end(),compare_records);
             fstream file(this->DATAFILE_DP,ios::binary | ios::out);
-            first_write_record_information(file,0,'d');
+            first_write_record_data(file,0,'d');
             for (AddressType i =0; i < record.size(); i++){
                 record[i].nextDel = i + 1;
                 if (i == record.size()-1)
@@ -145,7 +145,7 @@ public:
             fstream file(this->DATAFILE_DP, ios::binary | ios::out);
             record.nextDel = 1;
             record.ref = INVALID;
-            first_write_record_information(file, 0, 'd');
+            first_write_record_data(file, 0, 'd');
             write_record(0, file, record, DATAFILE);
             file.close();
             return;
@@ -157,6 +157,31 @@ public:
         file.close();
     }
 
+    pair<RecordData,RecordData> sequential_search(Key key){
+        fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in);
+        fstream auxFile(this->AUXFILE_DP,ios::binary | ios::in);
+        AddressType curr_pos, prev_pos = -1;
+        char curr_ref, prev_ref = INVALID;
+        first_read_record_data(dataFile,curr_pos,curr_ref);
+        Record curr_record, prev_record;
+        while (curr_ref != INVALID) {
+            if(curr_ref == 'd')
+                read_record(curr_pos,dataFile,curr_record,DATAFILE);
+            else if(curr_ref == 'a')
+                read_record(curr_pos,auxFile,curr_record,AUXFILE);
+            else
+                throw invalid_argument("Invalid reference @ sequential_search");
+            if (!curr_ref.less_than_key(key))
+                break;
+            prev_pos = curr_pos;
+            prev_ref = curr_ref;
+            prev_record = curr_record;
+            curr_pos = curr_record.nextDel;
+            curr_ref = curr_record.ref;
+        }
+        return  {RecordData(prev_pos,prev_ref,prev_record),RecordData(curr_pos,curr_ref,curr_record)};
+    }
+    
 };
 
 #endif //
