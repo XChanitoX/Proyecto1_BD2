@@ -10,4 +10,4 @@ Las Bases de Datos poseen gran importancia, tanto en el ámbito personal como en
 
 ## Video explicativo
 
-![](https://drive.google.com/file/d/1adjcs4Hk4iV_9xHqyW7ASrguZHuZui7q/view?usp=sharing)
+https://drive.google.com/file/d/1adjcs4Hk4iV_9xHqyW7ASrguZHuZui7q/view?usp=sharing
