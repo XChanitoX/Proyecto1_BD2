@@ -10,6 +10,9 @@
 #include <string.h>
 #include <cstdlib>
 #include <unistd.h>
+#include <cstring>
+#include <algorithm>
+#include <QStringListModel>
 
 using namespace std;
 

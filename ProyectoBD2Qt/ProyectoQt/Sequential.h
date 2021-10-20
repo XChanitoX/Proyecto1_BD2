@@ -6,7 +6,7 @@
 
 #define AddressType int32_t
 #define INVALID 'x'
-#define MAX_CAPACITY 5
+#define MAX_CAPACITY 1000
 
 using namespace std;
 
@@ -32,9 +32,9 @@ private:
     void write_record(AddressType pos, fstream& file, Record& record, FileID FileID){
         if (!file.is_open())
             throw out_of_range("File not open @ write_record");
-        if (FileID == FileID)
+        if (DATAFILE == FileID)
             file.seekp(pos * sizeof(Record) + sizeof(AddressType) + sizeof(char) + sizeof(bool),ios::beg);
-        else if (FileID = FileID)
+        else if (AUXFILE == FileID)
             file.seekp(pos*sizeof(Record),ios::beg);
         else
             throw invalid_argument("FileID invalid @ write_record");
@@ -47,12 +47,57 @@ private:
         file.write((char*)&pos, sizeof(AddressType));
         file.write((char*)&ref, sizeof(char));
     }
+
+    void insert_with_sequential_search(Record& record){
+        fstream dataFile(DATAFILE_DP,ios::binary | ios::in | ios::out);
+        fstream auxFile(AUXFILE_DP,ios::binary | ios::in | ios::out);
+        AddressType pos;
+        char ref;
+        first_read_record_data(dataFile,pos,ref);
+        cout << "Key" << record.get_key() << endl;
+        auto search_result = sequential_search(record.get_key());
+        char curr_ref = search_result.second.ref;
+        char prev_ref = search_result.first.ref;
+
+        if (prev_ref == INVALID){
+            first_write_record_data(dataFile,number_of_records(AUXFILE_DP,AUXFILE),'a');
+        }
+        if (curr_ref == INVALID && prev_ref == INVALID){
+            record.nextDel = number_of_records(dataFile,DATAFILE);
+            record.ref = INVALID;
+        }
+        else if (prev_ref == INVALID){
+            record.nextDel = pos;
+            record.ref = ref;
+        }
+        else{
+            Record prev_record = search_result.first.record;
+            AddressType prev_pos = search_result.first.pos;
+            record.nextDel = prev_record.nextDel;
+            record.ref = prev_record.ref;
+            prev_record.nextDel = number_of_records(AUXFILE_DP,AUXFILE);
+            prev_record.ref = 'a';
+            if (prev_ref == 'd')
+                write_record(prev_pos,dataFile,prev_record,DATAFILE);
+            else if (prev_ref == 'a')
+                write_record(prev_pos,auxFile,prev_record,AUXFILE);
+            else
+                throw invalid_argument("Invalid reference at second else @ insert_with_sequential_search");
+        }
+        auxFile.close();
+        auxFile.open(AUXFILE_DP,ios::binary | ios::out | ios::app);
+        auxFile.write((char*)&record, sizeof(Record));
+        auxFile.close();
+        dataFile.close();
+    }
+
+
     void read_record(AddressType pos, fstream& file, Record& record, FileID FileID){
         if (!file.is_open())
             throw out_of_range("File not open @ read_record");
-        if (FileID == FileID)
+        if (DATAFILE == FileID)
             file.seekg(pos * sizeof(Record) + sizeof(AddressType) + sizeof(char) + sizeof(bool),ios::beg);
-        else if (FileID = FileID)
+        else if (AUXFILE == FileID)
             file.seekg(pos*sizeof(Record),ios::beg);
         else
             throw invalid_argument("FileID invalid @ read_record");
@@ -92,7 +137,7 @@ private:
         return r1 < r2;
     }
     bool is_empty(FileID FileID){
-        if (FileID = DATAFILE)
+        if (FileID == DATAFILE)
             return number_of_records(this->DATAFILE_DP,DATAFILE) == 0;
         else if(FileID == AUXFILE)
             return number_of_records(this->AUXFILE_DP,AUXFILE) == 0;
@@ -135,7 +180,7 @@ public:
             fstream file(this->DATAFILE_DP,ios::binary | ios::out);
             first_write_record_data(file,0,'d');
             write_status_for_deleted_record(file,false);
-            for (int i =0; i < record.size(); i++){
+            for (auto i =0; i < record.size(); i++){
                 record[i].nextDel = i + 1;
                 if (i == record.size()-1)
                     record[i].ref = INVALID;
@@ -150,6 +195,7 @@ public:
                 add_record(record[i]);
         }
     }
+
     void add_record(Record record){
         if (is_empty(DATAFILE)){
             fstream file(this->DATAFILE_DP, ios::binary | ios::out);
@@ -184,9 +230,15 @@ public:
         read_status_for_deleted_record(file,status);
         file.close();
         if (status){
-            // Addition with seq search
+            cout << "Entering if condition @ insertion with seq search" << endl;
+            insert_with_sequential_search(record);
+        }
+        else{
+            cout << "Entering else condition @ insertion with seq search" << endl;
+            insert_with_sequential_search(record);
         }
     }
+
     pair<RecordData,RecordData> sequential_search(Key key){
         fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in);
         fstream auxFile(this->AUXFILE_DP,ios::binary | ios::in);
@@ -249,7 +301,64 @@ public:
             if (curr_record.greater_or_equal(start) && curr_record.less_or_equal(end))
                 result.push_back(curr_record);
             curr_pos = curr_record.nextDel;
+            curr_ref = curr_record.ref;
+            if (curr_ref == 'd'){
+                read_record(curr_pos,dataFile,curr_record,DATAFILE);
+            }
+            else if (curr_ref == 'a'){
+                read_record(curr_pos,auxFile,curr_record,AUXFILE);
+            }
         }
+        sort(result.begin(),result.end(),compare_records);
+        return result;
+    }
+
+    void remove_record(Key key){
+        if (!is_removable())
+            return;
+        auto search_result = sequential_search(key);
+        Record curr_record = search_result.second.record;
+        if (!curr_record.equal_key(key))
+            return;
+        fstream dataFile(this->DATAFILE_DP,ios::binary | ios::in | ios::out);
+        fstream auxFile(this->AUXFILE_DP,ios::binary | ios::in | ios::out);
+
+        auto prev_pos = search_result.first.pos;
+        auto prev_ref = search_result.first.ref;
+        Record prev_record = search_result.first.record;
+
+        auto curr_pos = search_result.second.pos;
+        auto curr_ref = search_result.second.ref;
+
+        auto next_pos = curr_record.nextDel;
+        auto next_ref = curr_record.ref;
+
+        if (prev_ref == INVALID){
+            first_write_record_data(dataFile,next_pos,next_ref);
+        }else{
+            prev_record.nextDel = next_pos;
+            prev_record.ref = next_ref;
+            if (prev_ref == 'd')
+                write_record(prev_pos,dataFile,prev_record,DATAFILE);
+            else if (prev_ref == 'a')
+                write_record(prev_pos,auxFile,prev_record,AUXFILE);
+            else
+                throw invalid_argument("Invalid reference @ remove_record");
+        }
+
+        curr_record.nextDel = -1;
+        curr_record.ref = INVALID;
+
+        if (curr_ref == 'd')
+            write_record(curr_pos,dataFile,curr_record,DATAFILE);
+        else if (curr_ref == 'a')
+            write_record(curr_pos,auxFile,curr_record,AUXFILE);
+        else
+            throw invalid_argument("Invalid reference @ remove_record");
+
+        write_status_for_deleted_record(dataFile,true);
+        dataFile.close();
+        auxFile.close();
     }
 
     vector<Record> load(){

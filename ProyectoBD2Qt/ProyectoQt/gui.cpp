@@ -7,14 +7,32 @@
 #include "Sequential.h"
 #include "Hash.h"
 
+vector<RecordEdu> registros;
+
 GUI::GUI(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::GUI)
 {
     ui->setupUi(this);
 
+    auto model = new QStringListModel(this);
+    QStringList list;
+    QString tabla1 = "EduDataSet";
+    QString tabla2 = "RealStateDataSet";
+    list << tabla1 << tabla2;
+    model->setStringList(list);
+    ui->Tablas->setModel(model);
+
     connect(ui->Enviar, SIGNAL(released()), this,
             SLOT(leyendoConsulta()));
+    connect(ui->Insert, SIGNAL(released()), this,
+            SLOT(Insertar()));
+    connect(ui->RangeSearch, SIGNAL(released()), this,
+            SLOT(RangeSearch()));
+    connect(ui->Search, SIGNAL(released()), this,
+            SLOT(Search()));
+    connect(ui->Remove, SIGNAL(released()), this,
+            SLOT(Remove()));
 }
 
 GUI::~GUI()
@@ -48,15 +66,30 @@ void GUI::leyendoConsulta(){
     fileName = fileName.substr(2, fileName.size()-4);
 
 
-    //Escoger el metodo a utilizar
-    /*
+
+    vector<vector<string>> parseado;
+
+    parseado = ParserCSV(fileName, ',');
+
+    vector<RecordEdu> registros;
+
+
+    for (int i = 1; i < parseado.size(); i++) {
+        RecordEdu record = RecordEdu(parseado[i][0],parseado[i][1],parseado[i][2],parseado[i][3],
+                parseado[i][4],parseado[i][5],parseado[i][6],parseado[i][7],parseado[i][8],parseado[i][9],
+                parseado[i][10],parseado[i][11],parseado[i][12],parseado[i][13],parseado[i][14],parseado[i][15],
+                parseado[i][16],parseado[i][17]);
+        registros.push_back(record);
+    }
+
+
     if(palabras[1].substr(palabras[1].size()-5,palabras[1].size()-2) == "hash;"){
         Hash(palabras[2]);
     }else{
-        Sequential(palabras[2]);
-    }*/
+        Sequential(palabras[2], registros);
+    }
 
-
+/*
     // Leer el archivo CSV
     ofstream Archivo;
     Archivo.open("../archivo.dat",ios::app|ios::binary);
@@ -64,12 +97,11 @@ void GUI::leyendoConsulta(){
     if(!Archivo.is_open()){
         throw new exception;
     }
-
+*/
     //Agarrando lo del Excel
-    vector<vector<string>> parseado;
-    vector<RecordEdu> registros;
-    parseado = ParserCSV(fileName, ',');
 
+
+/*
     for (int i = 0; i < parseado.size(); i++) {
         for (int j = 0; j < parseado[0].size(); j++) {
             Archivo << parseado[i][j] << ' ';
@@ -78,43 +110,153 @@ void GUI::leyendoConsulta(){
     }
 
     Archivo.close();
-
-    llenarTabla();
+*/
+    llenarTabla(registros);
 }
 
-void GUI::llenarTabla(){
+void GUI::llenarTabla(vector<RecordEdu> registros){
     csvModel = new QStandardItemModel(this);
-    vector<vector<string>> datos;
-    datos = ParserCSV("../archivo.dat", ' ');
-    int cantidadColumnas = datos[0].size();
-    int cantidadFilas = datos.size();
 
-    QStringList lista;
-    for (int i = 0; i < cantidadColumnas; i++) {
-        lista.append(QString::fromStdString(datos[0][i]));
-    }
+    int ix = 0;
+    while(ix != (int)registros.size()){
+        csvModel->setRowCount(ix);
+        auto line = registros[ix];
 
-    csvModel->setColumnCount(cantidadColumnas);
-    csvModel->setHorizontalHeaderLabels(lista);
-    QList<QStandardItem *> items;
+        vector <QString> values;
 
-    for (int i = 1; i < cantidadFilas; i++) {
-        items.clear();
+        QString ID = QString::fromStdString(line.ID);
+        QString Gender = QString::fromStdString(line.Gender);
+        QString Nacionalidad = QString::fromStdString(line.Nacionalidad);
+        QString PlaceofBirth = QString::fromStdString(line.PlaceofBirth);
+        QString StageID = QString::fromStdString(line.StageID);
+        QString GradeID = QString::fromStdString(line.GradeID);
+        QString SectionID = QString::fromStdString(line.SectionID);
+        QString Topic = QString::fromStdString(line.Topic);
+        QString Semester = QString::fromStdString(line.Semester);
+        QString Relation = QString::fromStdString(line.Relation);
+        QString raisedhands = QString::fromStdString(line.raisedhands);
+        QString visitedResources = QString::fromStdString(line.visitedResources);
+        QString announcements = QString::fromStdString(line.announcements);
+        QString discussion = QString::fromStdString(line.discussion);
+        QString parentAnswer = QString::fromStdString(line.parentAnswer);
+        QString parentSchool = QString::fromStdString(line.parentSchool);
+        QString studentAbsent = QString::fromStdString(line.studentAbsent);
+        QString clase = QString::fromStdString(line.clase);
 
-        for (int j = 0; j < cantidadColumnas; j++) {
-            items.append(new QStandardItem(datos[i][j].c_str()));
+        values.push_back(ID);
+        values.push_back(Gender);
+        values.push_back(Nacionalidad);
+        values.push_back(PlaceofBirth);
+        values.push_back(StageID);
+        values.push_back(GradeID);
+        values.push_back(SectionID);
+        values.push_back(Topic);
+        values.push_back(Semester);
+        values.push_back(Relation);
+        values.push_back(raisedhands);
+        values.push_back(visitedResources);
+        values.push_back(announcements);
+        values.push_back(discussion);
+        values.push_back(parentAnswer);
+        values.push_back(parentSchool);
+        values.push_back(studentAbsent);
+        values.push_back(clase);
+
+        const int colCount = values.size();
+        csvModel->setColumnCount(colCount);
+        for (int jx = 0; jx < colCount; ++jx) {
+            setValueAt(ix, jx, values.at(jx));
         }
+        ix++;
 
-        csvModel->appendRow(items);
+        for (int i = 0; i < colCount; ++i) {
+            values.pop_back();
+        }
     }
 
     ui->Respuesta->setModel(csvModel);
+}
+
+void GUI::Insertar(){
+    QString texto = ui->TextInsert->text();
+    string cadenaEntera = texto.toStdString();
+    string delimitador = ",";
+    vector<string> palabras{};
+
+    size_t pos = 0;
+    while ((pos = cadenaEntera.find(delimitador)) != string::npos) {
+        palabras.push_back(cadenaEntera.substr(0, pos));
+        cadenaEntera.erase(0, pos + delimitador.length());
+    }
+    palabras.push_back(cadenaEntera);
+
+    RecordEdu registro;
+    registro = RecordEdu(palabras[0],palabras[1],palabras[2],palabras[3],palabras[4],palabras[5],palabras[6],
+            palabras[7],palabras[8],palabras[9],palabras[10],palabras[11],palabras[12],palabras[13],palabras[14],
+            palabras[15],palabras[16],palabras[17]);
+
+    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+    sequentialFile.add_record(registro);
+    registros = sequentialFile.load();
+    llenarTabla(registros);
+
+}
+
+void GUI::Remove(){
+    QString texto = ui->TextDelete->text();
+    string cadenaEntera = texto.toStdString();
+    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+    sequentialFile.remove_record(cadenaEntera.c_str());
+    registros = sequentialFile.load();
+    llenarTabla(registros);
+}
+
+void GUI::RangeSearch(){
+    QString texto = ui->TextRangeSearch->text();
+    string cadenaEntera = texto.toStdString();
+    string delimitador = ",";
+    vector<string> palabras{};
+
+    size_t pos = 0;
+    while ((pos = cadenaEntera.find(delimitador)) != string::npos) {
+        palabras.push_back(cadenaEntera.substr(0, pos));
+        cadenaEntera.erase(0, pos + delimitador.length());
+    }
+    palabras.push_back(cadenaEntera);
+
+    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+    sequentialFile.search_per_range(palabras[0].c_str(),palabras[1].c_str());
+    registros = sequentialFile.load();
+    llenarTabla(sequentialFile.search_per_range(palabras[0].c_str(),palabras[1].c_str()));
+}
+
+
+void GUI::Search(){
+    QString texto = ui->TextSearch->text();
+    string cadenaEntera = texto.toStdString();
+    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+    sequentialFile.search_record(cadenaEntera.c_str());
+    registros = sequentialFile.load();
+    llenarTabla(sequentialFile.search_record(cadenaEntera.c_str()));
 }
 
 void GUI::Hash(string indicacion){
 
 }
 
-void GUI::Sequential(string indicacion){
-
+void GUI::Sequential(string indicacion, vector<RecordEdu> &registros){
+    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+    sequentialFile.insert_all(registros);
+    registros = sequentialFile.load();
 }
+
+void GUI::setValueAt(int ix, int jx, const QString &value)
+{
+    if(!csvModel->item(ix, jx)){
+        csvModel->setItem(ix, jx, new QStandardItem(value));
+    } else{
+        csvModel->item(ix, jx)->setText(value);
+    }
+}
+
+

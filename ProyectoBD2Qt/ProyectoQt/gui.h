@@ -6,6 +6,7 @@
 #include <QWidget>
 #include <QAbstractTableModel>
 #include "Librerias.h"
+#include "Record.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class GUI; }
@@ -24,10 +25,15 @@ private:
     QStandardItemModel *csvModel;
 
 private slots:
+    void setValueAt(int ix, int jx, const QString &value);
     void leyendoConsulta();
-    void llenarTabla();
+    void Insertar();
+    void Remove();
+    void RangeSearch();
+    void Search();
+    void llenarTabla(vector<RecordEdu> registros);
     void Hash(string indicacion);
-    void Sequential(string indicacion);
+    void Sequential(string indicacion, vector<RecordEdu> &registros);
 };
 
 
