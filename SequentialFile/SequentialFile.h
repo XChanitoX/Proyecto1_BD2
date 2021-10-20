@@ -160,7 +160,22 @@ public:
             return;
         }
         if (is_full()){
-            // rebuild aux file if full
+            auto records = load();
+
+            remove(this->DATAFILE_DP.c_str());
+            remove(this->AUXFILE_DP.c_str());
+
+            fstream dataFile(this->DATAFILE_DP, ios::binary | ios::out);
+            fstream auxFile(this->AUXFILE_DP, ios::binary | ios::out);
+
+            first_write_record_data(dataFile,0,'d');
+            write_status_for_deleted_record(dataFile,false);
+
+            for (int i = 0; i < records.size(); i++) 
+                write_record(i,dataFile,records[i],DATAFILE);
+
+            dataFile.close();
+            auxFile.close();
         }
         fstream file(this->DATAFILE_DP,ios::binary | ios::in | ios::out);
         bool status;
