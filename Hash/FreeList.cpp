@@ -124,3 +124,8 @@ vector<Record> FreeList<Record>::scanAll() {
     file.close();
     return vector;
 }
+
+template<class Record>
+void FreeList<Record>::setFileName(const string &fileName) {
+    FreeList::fileName = fileName;
+}
