@@ -32,14 +32,16 @@ private:
         return record;
     }
 public:
+    FreeList(){};
     FreeList(string _fileName_): fileName(_fileName_){}
     int length(fstream& file);
-    vector<Record> scanAll();
     ///Al agregar un registro, devuelve la posicion logica del registro agregado.
     int addRecord(Record record);
     Record& readRecord(int pos);
     void writeRecord(Record record, int pos);
+    void setFileName(const string &fileName);
     bool deleteRecord(int pos);
+    vector<Record> scanAll();
 };
 
 #endif //HASHINDEX_FREELIST_H
