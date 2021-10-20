@@ -90,8 +90,13 @@ struct RecordEdu
 
 };
 
-struct RecordState{
-
+struct RecordEduHash{
+    int operator()( const char* key){
+        string str(key);
+        hash<string> myHash;
+        return myHash(str);
+    }
 };
+
 
 #endif // RECORD_H

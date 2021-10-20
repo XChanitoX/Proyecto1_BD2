@@ -23,6 +23,7 @@ public:
 private:
     Ui::GUI *ui;
     QStandardItemModel *csvModel;
+    string metodo;
 
 private slots:
     void setValueAt(int ix, int jx, const QString &value);
@@ -32,7 +33,7 @@ private slots:
     void RangeSearch();
     void Search();
     void llenarTabla(vector<RecordEdu> registros);
-    void Hash(string indicacion);
+    void Hash(string indicacion, vector<RecordEdu> &registros);
     void Sequential(string indicacion, vector<RecordEdu> &registros);
 };
 

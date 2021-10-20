@@ -6,12 +6,14 @@
 #include <string>
 #include <ctime>
 #include <iostream>
+#include <algorithm>
 #include <sstream>
 #include <string.h>
 #include <cstdlib>
 #include <unistd.h>
 #include <cstring>
 #include <algorithm>
+#include <bitset>
 #include <QStringListModel>
 
 using namespace std;

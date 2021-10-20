@@ -1,7 +1,6 @@
 #include "gui.h"
 #include "./ui_gui.h"
-#include <string>
-#include <vector>
+#include "Librerias.h"
 #include "ParserCSV.h"
 #include "Record.h"
 #include "Sequential.h"
@@ -16,6 +15,7 @@ GUI::GUI(QWidget *parent)
     ui->setupUi(this);
 
     auto model = new QStringListModel(this);
+
     QStringList list;
     QString tabla1 = "EduDataSet";
     QString tabla2 = "RealStateDataSet";
@@ -42,7 +42,6 @@ GUI::~GUI()
 
 //---------------------------------------
 void GUI::leyendoConsulta(){
-
     QString consulta = ui->Consulta->toPlainText();
     string cadenaEntera = consulta.toStdString();
     string delimitador = "\n";
@@ -66,13 +65,11 @@ void GUI::leyendoConsulta(){
     fileName = fileName.substr(2, fileName.size()-4);
 
 
-
     vector<vector<string>> parseado;
 
     parseado = ParserCSV(fileName, ',');
 
     vector<RecordEdu> registros;
-
 
     for (int i = 1; i < parseado.size(); i++) {
         RecordEdu record = RecordEdu(parseado[i][0],parseado[i][1],parseado[i][2],parseado[i][3],
@@ -82,39 +79,19 @@ void GUI::leyendoConsulta(){
         registros.push_back(record);
     }
 
-
     if(palabras[1].substr(palabras[1].size()-5,palabras[1].size()-2) == "hash;"){
-        Hash(palabras[2]);
+        metodo = "hash";
+        Hash(palabras[2], registros);
     }else{
+        metodo = "sequential";
         Sequential(palabras[2], registros);
     }
 
-/*
-    // Leer el archivo CSV
-    ofstream Archivo;
-    Archivo.open("../archivo.dat",ios::app|ios::binary);
-
-    if(!Archivo.is_open()){
-        throw new exception;
-    }
-*/
-    //Agarrando lo del Excel
-
-
-/*
-    for (int i = 0; i < parseado.size(); i++) {
-        for (int j = 0; j < parseado[0].size(); j++) {
-            Archivo << parseado[i][j] << ' ';
-        }
-        Archivo << '\n';
-    }
-
-    Archivo.close();
-*/
     llenarTabla(registros);
 }
 
 void GUI::llenarTabla(vector<RecordEdu> registros){
+
     csvModel = new QStandardItemModel(this);
 
     int ix = 0;
@@ -195,20 +172,41 @@ void GUI::Insertar(){
             palabras[7],palabras[8],palabras[9],palabras[10],palabras[11],palabras[12],palabras[13],palabras[14],
             palabras[15],palabras[16],palabras[17]);
 
-    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
-    sequentialFile.add_record(registro);
-    registros = sequentialFile.load();
-    llenarTabla(registros);
+    if(metodo == "hash"){
+        auto hash = ExtendibleHash<RecordEdu,const char*,RecordEduHash>();
+        hash.setIndexName("../index.dat");
+        hash.setBucketName("../bucket.dat");
+        hash.insert(registro);
+        registros = hash.scanAll();
+        llenarTabla(registros);
+
+    }else{
+        auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+        sequentialFile.add_record(registro);
+        registros = sequentialFile.load();
+        llenarTabla(registros);
+    }
 
 }
 
 void GUI::Remove(){
     QString texto = ui->TextDelete->text();
     string cadenaEntera = texto.toStdString();
-    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
-    sequentialFile.remove_record(cadenaEntera.c_str());
-    registros = sequentialFile.load();
-    llenarTabla(registros);
+    if(metodo == "hash"){
+        auto hash = ExtendibleHash<RecordEdu,const char*,RecordEduHash>();
+        hash.setIndexName("../index.dat");
+        hash.setBucketName("../bucket.dat");
+        hash.remove(cadenaEntera.c_str());
+        registros = hash.scanAll();
+        llenarTabla(registros);
+
+    }else{
+        auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+        sequentialFile.remove_record(cadenaEntera.c_str());
+        registros = sequentialFile.load();
+        llenarTabla(registros);
+    }
+
 }
 
 void GUI::RangeSearch(){
@@ -224,24 +222,51 @@ void GUI::RangeSearch(){
     }
     palabras.push_back(cadenaEntera);
 
-    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
-    sequentialFile.search_per_range(palabras[0].c_str(),palabras[1].c_str());
-    registros = sequentialFile.load();
-    llenarTabla(sequentialFile.search_per_range(palabras[0].c_str(),palabras[1].c_str()));
+    if(metodo == "hash"){
+        auto hash = ExtendibleHash<RecordEdu,const char*,RecordEduHash>();
+        hash.setIndexName("../index.dat");
+        hash.setBucketName("../bucket.dat");
+        hash.searchRange(palabras[0].c_str(),palabras[1].c_str());
+        registros = hash.scanAll();
+        llenarTabla(registros);
+
+    }else{
+        auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+        sequentialFile.search_per_range(palabras[0].c_str(),palabras[1].c_str());
+        registros = sequentialFile.load();
+        llenarTabla(sequentialFile.search_per_range(palabras[0].c_str(),palabras[1].c_str()));
+    }
+
 }
 
 
 void GUI::Search(){
     QString texto = ui->TextSearch->text();
     string cadenaEntera = texto.toStdString();
-    auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
-    sequentialFile.search_record(cadenaEntera.c_str());
-    registros = sequentialFile.load();
-    llenarTabla(sequentialFile.search_record(cadenaEntera.c_str()));
+
+    if(metodo == "hash"){
+        auto hash = ExtendibleHash<RecordEdu,const char*,RecordEduHash>();
+        hash.setIndexName("../index.dat");
+        hash.setBucketName("../bucket.dat");
+        hash.search(cadenaEntera.c_str());
+        registros = hash.scanAll();
+        llenarTabla(registros);
+
+    }else{
+        auto sequentialFile = SequentialFile<RecordEdu,const char*>("../datafile.dat","../auxfile.dat");
+        sequentialFile.search_record(cadenaEntera.c_str());
+        registros = sequentialFile.load();
+        llenarTabla(sequentialFile.search_record(cadenaEntera.c_str()));
+    }
+
 }
 
-void GUI::Hash(string indicacion){
-
+void GUI::Hash(string indicacion, vector<RecordEdu> &registros){
+    auto hash = ExtendibleHash<RecordEdu,const char*,RecordEduHash>();
+    hash.setIndexName("../index.dat");
+    hash.setBucketName("../bucket.dat");
+    hash.insertAll(registros);
+    registros = hash.scanAll();
 }
 
 void GUI::Sequential(string indicacion, vector<RecordEdu> &registros){
